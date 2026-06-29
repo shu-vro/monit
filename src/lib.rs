@@ -215,12 +215,12 @@
 //!
 //! ## Module index
 //!
-//! - [`app`](app/index.html) — application state, event handling, background workers
-//! - [`net`](net/index.html) — Internet Sharing detection and client discovery
-//! - [`pf`](pf/index.html) — Packet Filter block list persistence
-//! - [`sudo`](sudo/index.html) — privileged command execution
-//! - [`ui`](ui/index.html) — Ratatui rendering
-//!
+//! - [`app`](crate::app) — application state, event handling, background workers
+//! - [`net`](crate::net) — Internet Sharing detection and client discovery
+//! - [`pf`](crate::pf) — Packet Filter block list persistence
+//! - [`sudo`](crate::sudo) — privileged command execution
+//! - [`ui`](crate::ui) — Ratatui rendering
+//!z
 //! ## Dependencies (why only two crates)
 //!
 //! | Crate | Role |

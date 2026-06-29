@@ -20,7 +20,10 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
 
       - name: Generate Documentation
-        run: cargo doc
+        run: cargo doc --no-deps
+
+      - name: Verify documentation output
+        run: test -f target/doc/monit/app/index.html
 
       - name: Create Redirect to Crate Docs
         run: |
@@ -33,3 +36,4 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./target/doc
           publish_branch: assets
+          force_orphan: true
