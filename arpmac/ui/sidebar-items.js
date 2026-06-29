@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["centered_rect","draw","draw_footer","draw_help","draw_password","draw_status","draw_table","draw_vendor","modal_footer","modal_footer_confirm"]};

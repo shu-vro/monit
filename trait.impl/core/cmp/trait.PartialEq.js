@@ -1,0 +1,9 @@
+(function() {
+    const implementors = Object.fromEntries([["arpmac",[["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.96.0/core/cmp/trait.PartialEq.html\" title=\"trait core::cmp::PartialEq\">PartialEq</a> for <a class=\"enum\" href=\"arpmac/app/enum.Modal.html\" title=\"enum arpmac::app::Modal\">Modal</a>",0],["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.96.0/core/cmp/trait.PartialEq.html\" title=\"trait core::cmp::PartialEq\">PartialEq</a> for <a class=\"enum\" href=\"arpmac/app/enum.PendingAction.html\" title=\"enum arpmac::app::PendingAction\">PendingAction</a>",0]]]]);
+    if (window.register_implementors) {
+        window.register_implementors(implementors);
+    } else {
+        window.pending_implementors = implementors;
+    }
+})()
+//{"start":59,"fragment_lengths":[546]}

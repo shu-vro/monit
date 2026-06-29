@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["block","blocks_path","load_blocked","reload","unblock","write_rules"],"mod":["dirs"]};

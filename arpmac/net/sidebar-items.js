@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["LEASES"],"fn":["cmd_output","connected_on_bridge","detect_sharing","discover_clients","extract_client_ip","find_bridge","format_bytes","in_subnet","lookup_vendor","netmask_to_prefix","nettop_bandwidth","parse_ifconfig","parse_leases"],"struct":["Client","LeaseRecord","Sharing"]};

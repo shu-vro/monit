@@ -1,0 +1,171 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="arpmac — macOS Internet Sharing manager"><title>arpmac - Rust</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../static.files/rustdoc-17e0aaed.css"><meta name="rustdoc-vars" data-root-path="../" data-static-root-path="../static.files/" data-current-crate="arpmac" data-themes="" data-resource-suffix="" data-rustdoc-version="1.96.0 (ac68faa20 2026-05-25)" data-channel="1.96.0" data-search-js="search-b5634cc7.js" data-stringdex-js="stringdex-2da4960a.js" data-settings-js="settings-170eb4bf.js" ><script src="../static.files/storage-41dd4d93.js"></script><script defer src="../crates.js"></script><script defer src="../static.files/main-5013f961.js"></script><noscript><link rel="stylesheet" href="../static.files/noscript-f7c3ffd8.css"></noscript><link rel="alternate icon" type="image/png" href="../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../static.files/favicon-044be391.svg"></head><body class="rustdoc mod crate"><a class="skip-main-content" href="#main-content">Skip to main content</a><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><rustdoc-topbar><h2><a href="#">Crate arpmac</a></h2></rustdoc-topbar><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../arpmac/index.html">arpmac</a><span class="version">0.1.0</span></h2></div><div class="sidebar-elems"><ul class="block"><li><a id="all-types" href="all.html">All Items</a></li></ul><section id="rustdoc-toc"><h3><a href="#">Sections</a></h3><ul class="block top-toc"><li><a href="#arpmac--macos-internet-sharing-manager" title="arpmac — macOS Internet Sharing manager">arpmac — macOS Internet Sharing manager</a><ul><li><a href="#quick-start" title="Quick start">Quick start</a></li><li><a href="#the-problem" title="The problem">The problem</a></li><li><a href="#how-internet-sharing-works-macos" title="How Internet Sharing works (macOS)">How Internet Sharing works (macOS)</a></li><li><a href="#terminology" title="Terminology">Terminology</a></li><li><a href="#architecture" title="Architecture">Architecture</a></li><li><a href="#what-you-need-to-learn-build-from-scratch-curriculum" title="What you need to learn (build-from-scratch curriculum)">What you need to learn (build-from-scratch curriculum)</a></li><li><a href="#reproduce-from-scratch" title="Reproduce from scratch">Reproduce from scratch</a></li><li><a href="#on-disk-files" title="On-disk files">On-disk files</a></li><li><a href="#keyboard-reference" title="Keyboard reference">Keyboard reference</a></li><li><a href="#module-index" title="Module index">Module index</a></li><li><a href="#dependencies-why-only-two-crates" title="Dependencies (why only two crates)">Dependencies (why only two crates)</a></li></ul></li></ul><h3><a href="#modules">Crate Items</a></h3><ul class="block"><li><a href="#modules" title="Modules">Modules</a></li><li><a href="#functions" title="Functions">Functions</a></li></ul></section><div id="rustdoc-modnav"></div></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><div class="width-limiter"><section id="main-content" class="content" tabindex="-1"><div class="main-heading"><h1>Crate <span>arpmac</span>&nbsp;<button id="copy-path" title="Copy item path to clipboard">Copy item path</button></h1><rustdoc-toolbar></rustdoc-toolbar><span class="sub-heading"><a class="src" href="../src/arpmac/lib.rs.html#1-307">Source</a> </span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><h2 id="arpmac--macos-internet-sharing-manager"><a class="doc-anchor" href="#arpmac--macos-internet-sharing-manager">§</a>arpmac — macOS Internet Sharing manager</h2>
+<p><strong>arpmac</strong> is a terminal UI (TUI) that gives you router-like visibility and control
+over devices connected through <strong>macOS Internet Sharing</strong> (Ethernet → Wi‑Fi).
+Apple’s built-in sharing has no client list, no blocking, and no bandwidth view —
+this project fills that gap using only native macOS tools and two Rust crates.</p>
+<h3 id="quick-start"><a class="doc-anchor" href="#quick-start">§</a>Quick start</h3><div class="example-wrap"><pre class="language-text"><code># Prerequisites: macOS, Rust (rustup), Internet Sharing enabled
+cargo build --release
+cargo run --release
+cargo doc --no-deps --open   # opens this documentation</code></pre></div><h3 id="the-problem"><a class="doc-anchor" href="#the-problem">§</a>The problem</h3>
+<p>When you enable <strong>Internet Sharing</strong>, your Mac becomes a small Wi‑Fi router.
+Unlike a real router, macOS does not expose:</p>
+<ul>
+<li>A live client list in System Settings</li>
+<li>MAC filtering or per-device blocking</li>
+<li>Per-client bandwidth usage</li>
+</ul>
+<p>Power users resort to manual Terminal commands (<code>arp -a</code>, <code>nmap</code>, <code>pfctl</code>, <code>iftop</code>).
+<strong>arpmac</strong> wraps those primitives into one keyboard-driven interface.</p>
+<h3 id="how-internet-sharing-works-macos"><a class="doc-anchor" href="#how-internet-sharing-works-macos">§</a>How Internet Sharing works (macOS)</h3><div class="example-wrap"><pre class="language-text"><code>  [ Ethernet / upstream ]          [ Your Mac ]              [ Wi‑Fi clients ]
+         en0  ─────────────────►  NAT + DHCP               phones, laptops
+                                  bridge100  ◄────────────►  192.168.2.x
+                                  192.168.2.1
+                                       │
+                                  pfctl (Packet Filter)
+                                  bootpd (DHCP server)</code></pre></div>
+<p>When sharing is <strong>on</strong>, macOS creates a hidden bridge interface (usually
+<a href="https://apple.stackexchange.com/questions/173563/how-is-the-hidden-interface-bridge100-working"><code>bridge100</code></a>)
+with gateway <code>192.168.2.1/24</code>. The DHCP daemon <a href="x-man-page://8/bootpd"><code>bootpd</code></a>
+assigns leases and writes them to <a href="file:///var/db/dhcpd_leases"><code>/var/db/dhcpd_leases</code></a>.</p>
+<p>When sharing is <strong>off</strong>, <code>bridge100</code> does not exist and arpmac shows <code>INACTIVE</code>.</p>
+<h3 id="terminology"><a class="doc-anchor" href="#terminology">§</a>Terminology</h3><div><table><thead><tr><th>Term</th><th>Meaning</th></tr></thead><tbody>
+<tr><td><strong>Internet Sharing</strong></td><td>macOS feature: share one interface’s internet to another (e.g. Ethernet → Wi‑Fi).</td></tr>
+<tr><td><strong>bridge100</strong></td><td>Virtual bridge interface created when sharing is active; clients connect here.</td></tr>
+<tr><td><strong>DHCP lease</strong></td><td>Record that a device was assigned an IP. Stored in <code>/var/db/dhcpd_leases</code> — includes <em>past</em> guests.</td></tr>
+<tr><td><strong>ARP</strong></td><td>Address Resolution Protocol. Maps IP → MAC on the local network. <code>arp -a</code> shows who the Mac has talked to recently.</td></tr>
+<tr><td><strong>MAC address</strong></td><td>Hardware ID of a network adapter (e.g. <code>aa:bb:cc:dd:ee:ff</code>). First 3 bytes = OUI (vendor).</td></tr>
+<tr><td><strong>PF / pfctl</strong></td><td>macOS <strong>Packet Filter</strong> firewall. <code>pfctl</code> loads rules; we use a dynamic <strong>anchor</strong> <code>arpmac/block</code>.</td></tr>
+<tr><td><strong>Anchor</strong></td><td>Named sub-ruleset in PF, loaded at runtime without editing <code>/etc/pf.conf</code>.</td></tr>
+<tr><td><strong>nettop</strong></td><td>Built-in macOS tool for per-connection byte counters (like <code>iftop</code>, but native).</td></tr>
+<tr><td><strong>TUI</strong></td><td>Text User Interface — full-screen terminal UI (as opposed to GUI or plain CLI).</td></tr>
+<tr><td><strong>Ratatui</strong></td><td>Rust library for building TUIs (successor to tui-rs).</td></tr>
+<tr><td><strong>crossterm</strong></td><td>Cross-platform terminal manipulation (raw mode, keyboard events).</td></tr>
+<tr><td><strong>● now / past</strong></td><td>arpmac labels: <em>now</em> = on bridge ARP right now; <em>past</em> = only in DHCP history.</td></tr>
+</tbody></table>
+</div><h3 id="architecture"><a class="doc-anchor" href="#architecture">§</a>Architecture</h3><div class="example-wrap"><pre class="language-text"><code>┌─────────────────────────────────────────────────────────────┐
+│  main.rs          entry point, terminal setup/teardown        │
+│       │                                                     │
+│       ▼                                                     │
+│  lib::run()       event loop (250 ms tick, 10 s auto-refresh)│
+│       │                                                     │
+│       ├── app.rs  App state, keys, background threads       │
+│       │      │                                              │
+│       │      ├── net.rs   discovery (leases, ARP, nettop)   │
+│       │      ├── pf.rs    block list + pfctl reload         │
+│       │      └── sudo.rs  pipe password to sudo -S          │
+│       │                                                     │
+│       └── ui.rs   ratatui draw (table, modals, status)      │
+└─────────────────────────────────────────────────────────────┘</code></pre></div><h4 id="refresh-data-flow"><a class="doc-anchor" href="#refresh-data-flow">§</a>Refresh data flow</h4><div class="example-wrap"><pre class="language-text"><code> User presses &#39;r&#39; (or 10 s timer)
+        │
+        ▼
+ app::App::refresh() ── spawns thread ─────────────────────────┐
+        │                                                       │
+        │  (UI stays responsive, shows &quot;Refreshing…&quot;)           │
+        │                                                       ▼
+        │                              pf::load_blocked()  ← ~/.config/arpmac/blocks.pf
+        │                              net::detect_sharing() ← ifconfig bridge100
+        │                              net::discover_clients()
+        │                                   ├─ connected_on_bridge() ← arp -a
+        │                                   ├─ parse_leases()      ← /var/db/dhcpd_leases
+        │                                   ├─ ping()              ← ping -c 1
+        │                                   └─ nettop_bandwidth()  ← nettop -L 1 …
+        │                                                       │
+        ◄──────── RefreshMsg::Done { sharing, clients } ────────┘
+        │
+        ▼
+ ui::draw() renders updated table</code></pre></div><h4 id="block-data-flow"><a class="doc-anchor" href="#block-data-flow">§</a>Block data flow</h4><div class="example-wrap"><pre class="language-text"><code> User presses &#39;b&#39; on selected client
+        │
+        ▼
+ Modal::Password (TUI, masked input)
+        │ Enter
+        ▼
+ pf::block(ip, password)
+        ├─ append IP to ~/.config/arpmac/blocks.pf
+        └─ sudo::run(password, [&quot;pfctl&quot;, &quot;-a&quot;, &quot;arpmac/block&quot;, &quot;-f&quot;, …])
+                  └─ sudo -S  (password on stdin)
+        │
+        ▼
+ Client loses internet; row shows BLOCKED</code></pre></div><h3 id="what-you-need-to-learn-build-from-scratch-curriculum"><a class="doc-anchor" href="#what-you-need-to-learn-build-from-scratch-curriculum">§</a>What you need to learn (build-from-scratch curriculum)</h3><h4 id="1-rust-basics"><a class="doc-anchor" href="#1-rust-basics">§</a>1. Rust basics</h4>
+<ul>
+<li>Ownership, <code>Result</code>/<code>Option</code>, modules, <code>std::process::Command</code></li>
+<li><a href="https://doc.rust-lang.org/book/">The Rust Book</a></li>
+</ul>
+<h4 id="2-terminal--tui"><a class="doc-anchor" href="#2-terminal--tui">§</a>2. Terminal / TUI</h4>
+<ul>
+<li><strong>Raw mode</strong>: keyboard input byte-by-byte without line buffering</li>
+<li><strong>Alternate screen</strong>: full-screen app that restores on exit</li>
+<li>Event loop: poll keyboard → update state → draw → repeat</li>
+<li><a href="https://ratatui.rs/">Ratatui tutorial</a></li>
+</ul>
+<h4 id="3-networking-macos-specific"><a class="doc-anchor" href="#3-networking-macos-specific">§</a>3. Networking (macOS-specific)</h4>
+<ul>
+<li>IPv4 subnets and CIDR (<code>192.168.2.0/24</code>)</li>
+<li>DHCP vs ARP vs ping as liveness signals</li>
+<li>Read: <code>man ifconfig</code>, <code>man arp</code>, <code>man pfctl</code>, <code>man nettop</code></li>
+</ul>
+<h4 id="4-process-design-choices-this-project"><a class="doc-anchor" href="#4-process-design-choices-this-project">§</a>4. Process design choices (this project)</h4>
+<ul>
+<li><strong>YAGNI</strong>: no nmap/iftop dependencies — shell out to what’s already on macOS</li>
+<li><strong>Background threads + channels</strong>: slow <code>ping</code>/<code>nettop</code> must not freeze the TUI</li>
+<li><strong>Session password cache</strong>: ask once per run, reuse for subsequent <code>pfctl</code> calls</li>
+<li><strong>Online vs past</strong>: DHCP file is historical; bridge ARP is the live signal</li>
+</ul>
+<h3 id="reproduce-from-scratch"><a class="doc-anchor" href="#reproduce-from-scratch">§</a>Reproduce from scratch</h3><h4 id="step-1--project-skeleton"><a class="doc-anchor" href="#step-1--project-skeleton">§</a>Step 1 — Project skeleton</h4><div class="example-wrap"><pre class="language-text"><code>cargo new arpmac</code></pre></div>
+<p>Add to <code>Cargo.toml</code>:</p>
+<div class="example-wrap"><pre class="language-toml"><code>[dependencies]
+ratatui = &quot;0.29&quot;
+crossterm = &quot;0.28&quot;</code></pre></div><h4 id="step-2--module-layout"><a class="doc-anchor" href="#step-2--module-layout">§</a>Step 2 — Module layout</h4><div class="example-wrap"><pre class="language-text"><code>src/
+  lib.rs    crate docs + run() event loop
+  main.rs   calls arpmac::run()
+  app.rs    state machine
+  net.rs    shell commands for discovery
+  pf.rs     PF rule file + pfctl
+  sudo.rs   sudo -S wrapper
+  ui.rs     ratatui widgets</code></pre></div><h4 id="step-3--implement-in-order"><a class="doc-anchor" href="#step-3--implement-in-order">§</a>Step 3 — Implement in order</h4>
+<ol>
+<li><strong><code>net::detect_sharing</code></strong> — parse <code>ifconfig bridge100</code> for inet + netmask</li>
+<li><strong><code>net::discover_clients</code></strong> — leases + bridge ARP + ping + nettop</li>
+<li><strong><code>ui::draw</code></strong> — table with columns IP, MAC, Name, Online, bandwidth</li>
+<li><strong><code>app::App</code></strong> — key handling, refresh thread</li>
+<li><strong><code>pf::block</code> / <code>pf::unblock</code></strong> — persist rules, <code>pfctl -a arpmac/block</code></li>
+<li><strong><code>sudo::run</code></strong> — TUI password → <code>sudo -S</code></li>
+<li>Modals — help, vendor lookup (<code>curl</code> + api.macvendors.com)</li>
+</ol>
+<h4 id="step-4--test-manually"><a class="doc-anchor" href="#step-4--test-manually">§</a>Step 4 — Test manually</h4>
+<ol>
+<li>Enable Internet Sharing (System Settings → General → Sharing)</li>
+<li>Connect a phone to your Mac’s shared Wi‑Fi</li>
+<li><code>cargo run</code> — client appears as <code>● now</code></li>
+<li>Press <code>b</code>, enter password — client blocked</li>
+<li>Press <code>a</code> — toggle online-only vs full DHCP history</li>
+</ol>
+<h3 id="on-disk-files"><a class="doc-anchor" href="#on-disk-files">§</a>On-disk files</h3><div><table><thead><tr><th>Path</th><th>Purpose</th></tr></thead><tbody>
+<tr><td><code>/var/db/dhcpd_leases</code></td><td>DHCP lease database (read-only for users)</td></tr>
+<tr><td><code>~/.config/arpmac/blocks.pf</code></td><td>PF rules generated by arpmac</td></tr>
+<tr><td><code>bridge100</code></td><td>Virtual interface (exists only when sharing is on)</td></tr>
+</tbody></table>
+</div><h3 id="keyboard-reference"><a class="doc-anchor" href="#keyboard-reference">§</a>Keyboard reference</h3><div><table><thead><tr><th>Key</th><th>Action</th></tr></thead><tbody>
+<tr><td><code>↑/↓</code> <code>j/k</code></td><td>Select row</td></tr>
+<tr><td><code>r</code></td><td>Refresh client list</td></tr>
+<tr><td><code>a</code></td><td>Toggle online-only / show all history</td></tr>
+<tr><td><code>b</code> / <code>u</code></td><td>Block / unblock selected client</td></tr>
+<tr><td><code>v</code></td><td>MAC vendor lookup</td></tr>
+<tr><td><code>?</code></td><td>Help modal</td></tr>
+<tr><td><code>q</code> / Esc</td><td>Quit (or cancel modal)</td></tr>
+</tbody></table>
+</div><h3 id="module-index"><a class="doc-anchor" href="#module-index">§</a>Module index</h3>
+<ul>
+<li><a href="app/index.html" title="mod arpmac::app"><code>app</code></a> — application state, event handling, background workers</li>
+<li><a href="net/index.html" title="mod arpmac::net"><code>net</code></a> — Internet Sharing detection and client discovery</li>
+<li><a href="pf/index.html" title="mod arpmac::pf"><code>pf</code></a> — Packet Filter block list persistence</li>
+<li><a href="sudo/index.html" title="mod arpmac::sudo"><code>sudo</code></a> — privileged command execution</li>
+<li><a href="ui/index.html" title="mod arpmac::ui"><code>ui</code></a> — Ratatui rendering
+z</li>
+</ul>
+<h3 id="dependencies-why-only-two-crates"><a class="doc-anchor" href="#dependencies-why-only-two-crates">§</a>Dependencies (why only two crates)</h3><div><table><thead><tr><th>Crate</th><th>Role</th></tr></thead><tbody>
+<tr><td><strong>ratatui</strong></td><td>Layout, tables, styled text, widgets</td></tr>
+<tr><td><strong>crossterm</strong></td><td>Raw mode, alternate screen, keyboard events</td></tr>
+</tbody></table>
+</div>
+<p>Everything else uses <strong><code>std::process::Command</code></strong> to call macOS binaries already on the system.</p>
+</div></details><h2 id="modules" class="section-header">Modules<a href="#modules" class="anchor">§</a></h2><dl class="item-table"><dt><a class="mod" href="app/index.html" title="mod arpmac::app">app</a></dt><dd>Application state, keyboard handling, and background workers.</dd><dt><a class="mod" href="net/index.html" title="mod arpmac::net">net</a></dt><dd>Internet Sharing detection and Wi‑Fi client discovery.</dd><dt><a class="mod" href="pf/index.html" title="mod arpmac::pf">pf</a></dt><dd>Packet Filter (PF) block list persistence and reload.</dd><dt><a class="mod" href="sudo/index.html" title="mod arpmac::sudo">sudo</a></dt><dd>Privileged command execution via <code>sudo -S</code>.</dd><dt><a class="mod" href="ui/index.html" title="mod arpmac::ui">ui</a></dt><dd>Ratatui rendering — layout, table, modals.</dd></dl><h2 id="functions" class="section-header">Functions<a href="#functions" class="anchor">§</a></h2><dl class="item-table"><dt><a class="fn" href="fn.run.html" title="fn arpmac::run">run</a></dt><dd>Run the arpmac TUI event loop until the user quits.</dd></dl></section></div></main></body></html>
