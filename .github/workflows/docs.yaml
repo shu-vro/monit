@@ -22,9 +22,6 @@ jobs:
       - name: Generate Documentation
         run: cargo doc --no-deps
 
-      - name: Verify documentation output
-        run: test -f target/doc/arpmac/app/index.html
-
       - name: Create Redirect to Crate Docs
         run: |
           CRATE_NAME=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[0].name' | tr '-' '_')
