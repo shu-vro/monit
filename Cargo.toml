@@ -1,0 +1,13 @@
+[package]
+name = "monit"
+version = "0.1.0"
+edition = "2024"
+description = "TUI for managing macOS Internet Sharing clients — list, block, bandwidth"
+readme = "README.md"
+
+[dependencies]
+ratatui = "0.29"
+crossterm = "0.28"
+
+[package.metadata.docs.rs]
+all-features = true
