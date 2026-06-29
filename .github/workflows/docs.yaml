@@ -20,7 +20,7 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
 
       - name: Generate Documentation
-        run: cargo doc --no-deps --workspace
+        run: cargo doc
 
       - name: Create Redirect to Crate Docs
         run: |
