@@ -23,7 +23,7 @@ jobs:
         run: cargo doc --no-deps
 
       - name: Verify documentation output
-        run: test -f target/doc/monit/app/index.html
+        run: test -f target/doc/arpmac/app/index.html
 
       - name: Create Redirect to Crate Docs
         run: |

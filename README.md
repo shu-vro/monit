@@ -1,4 +1,4 @@
-# monit
+# arpmac
 
 TUI for managing **macOS Internet Sharing** — see who's connected, block devices, view bandwidth.
 
@@ -9,9 +9,9 @@ It basically does
 1. `arp -a -i bridge100`
 2. `/var/db/dhcpd_leases`
 3. `nettop -L 1 -n -x -d -t external`
-4. `pfctl -a monit/block -F all`
-5. `pfctl -a monit/block -f ~/.config/monit/blocks.pf`
-6. `pfctl -a monit/block -a monit/block -f ~/.config/monit/blocks.pf`
+4. `pfctl -a arpmac/block -F all`
+5. `pfctl -a arpmac/block -f ~/.config/arpmac/blocks.pf`
+6. `pfctl -a arpmac/block -a arpmac/block -f ~/.config/arpmac/blocks.pf`
 
 here, `arp -a -i bridge100` basically gets all connected networks in bridge100 (or bridge0 if 100 not available) which is internet sharing's bridge
 
@@ -21,11 +21,11 @@ here, `arp -a -i bridge100` basically gets all connected networks in bridge100 (
 
 `pfctl` is used to block/unblock networks
 
-`pfctl -a monit/block -F all` clears every rule sets inside `/monit/block`.
+`pfctl -a arpmac/block -F all` clears every rule sets inside `/arpmac/block`.
 
-`pfctl -a monit/block -f ~/.config/monit/blocks.pf` loads the rules from `~/.config/monit/blocks.pf`
+`pfctl -a arpmac/block -f ~/.config/arpmac/blocks.pf` loads the rules from `~/.config/arpmac/blocks.pf`
 
-`pfctl -a monit/block -a monit/block -f ~/.config/monit/blocks.pf` loads the rules from `~/.config/monit/blocks.pf`
+`pfctl -a arpmac/block -a arpmac/block -f ~/.config/arpmac/blocks.pf` loads the rules from `~/.config/arpmac/blocks.pf`
 
 if you combine all these operation, you will get this utility's core job.
 

@@ -3,7 +3,7 @@
 //! The screen is divided into three vertical panes:
 //!
 //! ```text
-//! ┌ monit — Internet Sharing ─────────────────────┐  ← draw_status (3 lines)
+//! ┌ arpmac — Internet Sharing ─────────────────────┐  ← draw_status (3 lines)
 //! │ Status: ACTIVE  bridge100  192.168.2.1/24     │
 //! ├ IP ─── MAC ─── Name ── Online ── ↓/↑ ─────────┤  ← draw_table (flex)
 //! │ ▶192.168.2.5  …        ● now   1.2K/340       │
@@ -89,7 +89,7 @@ fn draw_status(f: &mut Frame, app: &App, area: Rect) {
     }
 
     let block = Block::default()
-        .title(" monit — Internet Sharing ")
+        .title(" arpmac — Internet Sharing ")
         .borders(Borders::ALL);
     f.render_widget(Paragraph::new(line).block(block), area);
 }

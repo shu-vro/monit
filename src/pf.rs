@@ -1,9 +1,9 @@
 //! Packet Filter (PF) block list persistence and reload.
 //!
-//! monit blocks clients by loading rules into a dynamic PF **anchor** named
-//! `monit/block`. This avoids editing system `/etc/pf.conf`.
+//! arpmac blocks clients by loading rules into a dynamic PF **anchor** named
+//! `arpmac/block`. This avoids editing system `/etc/pf.conf`.
 //!
-//! ## Rule file format (`~/.config/monit/blocks.pf`)
+//! ## Rule file format (`~/.config/arpmac/blocks.pf`)
 //!
 //! ```text
 //! block drop quick from 192.168.2.5 to any
@@ -15,13 +15,13 @@
 //! ## Reload command
 //!
 //! ```text
-//! sudo -S pfctl -a monit/block -f ~/.config/monit/blocks.pf
+//! sudo -S pfctl -a arpmac/block -f ~/.config/arpmac/blocks.pf
 //! ```
 //!
 //! When the block list is empty, the anchor is flushed instead:
 //!
 //! ```text
-//! sudo -S pfctl -a monit/block -F all
+//! sudo -S pfctl -a arpmac/block -F all
 //! ```
 
 use std::fs;
@@ -31,11 +31,11 @@ use std::path::PathBuf;
 mod dirs {
     use std::path::PathBuf;
 
-    /// Return `~/.config/monit`, falling back to `/tmp/monit`.
+    /// Return `~/.config/arpmac`, falling back to `/tmp/arpmac`.
     pub fn config_dir() -> PathBuf {
         std::env::var_os("HOME")
-            .map(|h| PathBuf::from(h).join(".config").join("monit"))
-            .unwrap_or_else(|| PathBuf::from("/tmp/monit"))
+            .map(|h| PathBuf::from(h).join(".config").join("arpmac"))
+            .unwrap_or_else(|| PathBuf::from("/tmp/arpmac"))
     }
 }
 
@@ -110,14 +110,14 @@ pub fn unblock(ip: &str, password: &str) -> Result<(), String> {
 fn reload(password: &str) -> io::Result<()> {
     let ips = load_blocked()?;
     if ips.is_empty() {
-        let out = crate::sudo::run(password, &["pfctl", "-a", "monit/block", "-F", "all"])?;
+        let out = crate::sudo::run(password, &["pfctl", "-a", "arpmac/block", "-F", "all"])?;
         if out.status.success() {
             return Ok(());
         }
         return Ok(());
     }
     let path = blocks_path().to_string_lossy().to_string();
-    let out = crate::sudo::run(password, &["pfctl", "-a", "monit/block", "-f", &path])?;
+    let out = crate::sudo::run(password, &["pfctl", "-a", "arpmac/block", "-f", &path])?;
     if out.status.success() {
         return Ok(());
     }

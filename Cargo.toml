@@ -1,5 +1,5 @@
 [package]
-name = "monit"
+name = "arpmac"
 version = "0.1.0"
 edition = "2024"
 description = "TUI for managing macOS Internet Sharing clients — list, block, bandwidth"

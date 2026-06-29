@@ -1,6 +1,6 @@
 //! Privileged command execution via `sudo -S`.
 //!
-//! monit collects the administrator password in a **TUI modal** (not a macOS
+//! arpmac collects the administrator password in a **TUI modal** (not a macOS
 //! dialog) and pipes it to `sudo` on stdin.
 //!
 //! ```text

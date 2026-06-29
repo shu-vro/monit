@@ -72,7 +72,7 @@ pub enum Modal {
     },
 }
 
-/// Full application state for one monit session.
+/// Full application state for one arpmac session.
 pub struct App {
     /// Internet Sharing detection result (updated each refresh).
     pub sharing: Sharing,

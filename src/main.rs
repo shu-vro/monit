@@ -1,6 +1,6 @@
-//! Binary entry point for **monit**.
+//! Binary entry point for **arpmac**.
 //!
-//! On macOS, delegates to [`monit::run`]. On other platforms, prints an error and exits.
+//! On macOS, delegates to [`arpmac::run`]. On other platforms, prints an error and exits.
 //!
 //! ```text
 //! cargo run          # run the TUI
@@ -9,11 +9,11 @@
 
 #[cfg(not(target_os = "macos"))]
 fn main() {
-    eprintln!("monit requires macOS");
+    eprintln!("arpmac requires macOS");
     std::process::exit(1);
 }
 
 #[cfg(target_os = "macos")]
 fn main() -> std::io::Result<()> {
-    monit::run()
+    arpmac::run()
 }
